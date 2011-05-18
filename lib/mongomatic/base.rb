@@ -4,13 +4,13 @@ module Mongomatic
     include Mongomatic::Util
     include Mongomatic::ActiveModelCompliancy
     include Mongomatic::TypedFields
-    
+
     class << self
       # Returns this models own db attribute if set, otherwise will return Mongomatic.db
       def db
         @db || Mongomatic.db || raise(ArgumentError, "No db supplied")
       end
-      
+
       # Override Mongomatic.db with a Mongo::DB instance for this model specifically
       #  MyModel.db = Mongo::Connection.new().db('mydb_mymodel')
       def db=(obj)
@@ -33,36 +33,34 @@ module Mongomatic
       def find(query={}, opts={})
         Mongomatic::Cursor.new(self, collection.find(query, opts))
       end
-      
+
+      alias_method :all, :find
+
       # Query MongoDB and return one document only. Same arguments as http://api.mongodb.org/ruby/current/Mongo/Collection.html#find_one-instance_method
       def find_one(query={}, opts={})
         return nil unless doc = self.collection.find_one(query, opts)
         self.new(doc, false)
       end
-      
-      # Return a Mongomatic::Cursor instance of all documents in the collection.
-      def all
-        find
-      end
-      
+
       # Iterate over all documents in the collection (uses a Mongomatic::Cursor)
-      def each
-        find.each { |found| yield(found) }
+      def each(query={}, opts={})
+        find(query, opts).each { |found| yield(found) }
       end
-      
-      # Return the first document in the collection
-      def first
-        find.limit(1).next_document
+
+      # Return the first document in the collection.
+      def first(query={}, opts={})
+        find(query, opts).limit(1).next_document
       end
-      
-      # Is the collection empty? This method is much more efficient than doing Collection.count == 0
-      def empty?
-        find.limit(1).has_next? == false
+
+      # Is the collection empty? This method is much more efficient than doing
+      # Collection.count == 0.
+      def empty?(query={}, opts={})
+        find(query, opts).limit(1).has_next? == false
       end
-      
-      # Return the number of documents in the collection
-      def count
-        find.count
+
+      # Return the number of documents in the collection.
+      def count(query={}, opts={})
+        find(query, opts).count
       end
 
       def drop
@@ -70,17 +68,17 @@ module Mongomatic
         collection.drop
         do_callback(:after_drop)
       end
-      
+
       def do_callback(meth)
         return false unless respond_to?(meth, true)
         send(meth)
       end
-      
+
       def insert(doc_hash, opts={})
         d = new(doc_hash)
         d.insert(opts)
       end
-      
+
       def insert!(doc_hash, opts={})
         insert(doc_hash, opts.merge(:safe => true))
       end
@@ -95,16 +93,16 @@ module Mongomatic
       self.errors  = Mongomatic::Errors.new
       do_callback(:after_initialize)
     end
-    
+
     def doc=(hash)
       hash = Mongomatic::MHash.new(hash) unless hash.is_a?(Mongomatic::MHash)
       @doc = hash
     end
-    
+
     def doc
       @doc
     end
-    
+
     # Override this with your own validate() method for validations.
     # Simply push your errors into the self.errors property and
     # if self.errors remains empty your document will be valid.
@@ -114,7 +112,7 @@ module Mongomatic
     def validate
       true
     end
-    
+
     def valid?
       check_typed_fields!
       self.errors = Mongomatic::Errors.new
@@ -123,38 +121,38 @@ module Mongomatic
       do_callback(:after_validate)
       self.errors.empty?
     end
-    
+
     def is_new?
       self.is_new == true
     end
-    
+
     def new?
       self.is_new == true
     end
-    
+
     # Set a field on this document:
     #  mydoc["name"] = "Ben"
     #  mydoc["address"] = { "city" => "San Francisco" }
     def []=(k,v)
       @doc[k.to_s] = v
     end
-    
+
     # Returns true if document contains key
     def has_key?(key)
       field, hash = hash_for_field(key.to_s, true)
       hash.has_key?(field)
     end
-    
+
     def set_value_for_key(key, value)
       field, hash = hash_for_field(key.to_s)
       hash[field] = value
     end
-    
+
     def value_for_key(key)
       field, hash = hash_for_field(key.to_s, true)
       hash[field]
     end
-   
+
     ##
     # Same as Hash#delete
     #
@@ -172,18 +170,18 @@ module Mongomatic
     def [](k)
       @doc[k.to_s]
     end
-    
+
     # Merge this document with the supplied hash. Useful for updates:
     #  mydoc.merge(params[:user])
     def merge(hash)
       hash.each { |k,v| self[k] = v }; @doc
     end
-    
+
     # Will return true if the document has been removed.
     def removed?
       self.removed == true
     end
-    
+
     # Check equality with another Mongomatic document
     def ==(obj)
       obj.is_a?(self.class) && obj.doc["_id"] == @doc["_id"]
@@ -222,8 +220,8 @@ module Mongomatic
       do_callback(:after_insert_or_update)
       ret
     end
-    
-    # Calls insert(...) with {:safe => true} passed in as an option. 
+
+    # Calls insert(...) with {:safe => true} passed in as an option.
     #   * Raises Mongo::OperationError if there was a DB error on inserting
     # If you want to raise the following errors also, pass in {:raise => true}
     #   * Raises Mongomatic::Exceptions::DocumentNotNew if document is not new
@@ -231,7 +229,7 @@ module Mongomatic
     def insert!(opts={})
       insert(opts.merge(:safe => true))
     end
-    
+
     # Will persist any changes you have made to the document. Silently fails on
     # db update error. Use update! or pass in {:safe => true} to raise a
     # Mongo::OperationError if that's what you want.
@@ -254,8 +252,8 @@ module Mongomatic
       do_callback(:after_insert_or_update)
       ret
     end
-    
-    # Calls update(...) with {:safe => true} passed in as an option. 
+
+    # Calls update(...) with {:safe => true} passed in as an option.
     #   * Raises Mongo::OperationError if there was a DB error on updating
     # If you want to raise the following errors also, pass in {:raise => true}
     #   * Raises Mongomatic::Exceptions::DocumentIsNew if document is new
@@ -264,7 +262,7 @@ module Mongomatic
     def update!(opts={},update_doc=@doc)
       update(opts.merge(:safe => true),update_doc)
     end
-    
+
     # Remove this document from the collection. Silently fails on db error,
     # use remove! or pass in {:safe => true} if you want an exception raised.
     # If you want to raise the following errors also, pass in {:raise => true}
@@ -284,8 +282,8 @@ module Mongomatic
       do_callback(:after_remove)
       ret
     end
-    
-    # Calls remove(...) with {:safe => true} passed in as an option. 
+
+    # Calls remove(...) with {:safe => true} passed in as an option.
     #   * Raises Mongo::OperationError if there was a DB error on removing
     # If you want to raise the following errors also, pass in {:raise => true}
     #   * Raises Mongomatic::Exceptions::DocumentIsNew if document is new
@@ -293,12 +291,12 @@ module Mongomatic
     def remove!(opts={})
       remove(opts.merge(:safe => true))
     end
-    
+
     # Return this document as a hash.
     def to_hash
       @doc || {}
     end
-    
+
     def hash_for_field(field, break_if_dne=false)
       parts = field.split(".")
       curr_hash = self.doc
@@ -311,14 +309,14 @@ module Mongomatic
         curr_hash = curr_hash[part]
       end
     end
-    
+
     def do_callback(meth)
-      notify(meth) if self.class.included_modules.include?(Mongomatic::Observable) # TODO entire block is smelly, doesnt belong here 
-      
+      notify(meth) if self.class.included_modules.include?(Mongomatic::Observable) # TODO entire block is smelly, doesnt belong here
+
       return false unless respond_to?(meth, true)
       send(meth)
     end
-    
+
     def transaction(key=nil, duration=5, &block)
       raise Mongomatic::Exceptions::DocumentIsNew if new?
       if key.is_a?(Hash) && key[:scope]

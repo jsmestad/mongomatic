@@ -4,7 +4,7 @@ module Mongomatic
       def self.name
         "expected"
       end
-      
+
       def to_be
         case value
         when Proc

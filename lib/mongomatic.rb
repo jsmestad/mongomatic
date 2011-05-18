@@ -10,7 +10,7 @@ module Mongomatic
     def db
       @db
     end
-    
+
     # Set to an instance of Mongo::DB to be used for all models:
     #  Mongomatic.db = Mongo::Connection.new().db('mydb')
     def db=(obj)
