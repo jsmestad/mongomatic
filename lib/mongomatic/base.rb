@@ -43,23 +43,24 @@ module Mongomatic
       end
 
       # Iterate over all documents in the collection (uses a Mongomatic::Cursor)
-      def each
-        find.each { |found| yield(found) }
+      def each(query={}, opts={})
+        find(query, opts).each { |found| yield(found) }
       end
 
-      # Return the first document in the collection
-      def first
-        find.limit(1).next_document
+      # Return the first document in the collection.
+      def first(query={}, opts={})
+        find(query, opts).limit(1).next_document
       end
 
-      # Is the collection empty? This method is much more efficient than doing Collection.count == 0
-      def empty?
-        find.limit(1).has_next? == false
+      # Is the collection empty? This method is much more efficient than doing
+      # Collection.count == 0.
+      def empty?(query={}, opts={})
+        find(query, opts).limit(1).has_next? == false
       end
 
-      # Return the number of documents in the collection
-      def count
-        find.count
+      # Return the number of documents in the collection.
+      def count(query={}, opts={})
+        find(query, opts).count
       end
 
       def drop
