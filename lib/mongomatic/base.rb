@@ -34,15 +34,12 @@ module Mongomatic
         Mongomatic::Cursor.new(self, collection.find(query, opts))
       end
 
+      alias_method :all, :find
+
       # Query MongoDB and return one document only. Same arguments as http://api.mongodb.org/ruby/current/Mongo/Collection.html#find_one-instance_method
       def find_one(query={}, opts={})
         return nil unless doc = self.collection.find_one(query, opts)
         self.new(doc, false)
-      end
-
-      # Return a Mongomatic::Cursor instance of all documents in the collection.
-      def all
-        find
       end
 
       # Iterate over all documents in the collection (uses a Mongomatic::Cursor)
