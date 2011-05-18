@@ -3,32 +3,32 @@ module Mongomatic
     def self.included(base)
       base.send(:extend, ClassMethods)
     end
-    
+
     def notify(meth, opts = {})
       self.class.observers.each do |observer|
         @observer_cache ||= {}
         unless observer_klass = @observer_cache[observer]
           @observer_cache[observer] = observer_klass = Object.const_get(observer) if Module.const_defined?(observer)
         end
-        
+
         if observer_klass
           instance = observer_klass.new
           instance.send(meth, self, opts) if instance.respond_to?(meth)
         end
       end
     end
-    
+
     module ClassMethods
       def observers
         @observers ||= []
       end
-      
+
       def add_observer(klass)
         @observers ||= []
         @observers << klass.to_s.to_sym unless @observers.include?(klass.to_s.to_sym)
       end
       alias :observer :add_observer
-      
+
       def has_observer?(klass_or_sym)
         case klass_or_sym
         when Symbol
@@ -37,7 +37,7 @@ module Mongomatic
           @observers.include?(klass.to_s.to_sym)
         end
       end
-      
+
       def remove_observers
         @observers = []
       end
