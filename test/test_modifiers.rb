@@ -153,6 +153,14 @@ class TestModifiers < MiniTest::Unit::TestCase
     p1 = Person.find_one(p1["_id"])
     assert_equal "Ben", p1["l1"]["l2"]["l3"]["l4"]["name"]
   end
+
+  def test_set_for_embedded_hash_of_nested_document_collection
+    p1 = Person.new(:name => "Tony")
+    p1.push('friends', Person.new(:name => "Jordan").doc)
+    assert p1.insert!
+    p1.set!("friends.0.isAwesome", "Absolutely!")
+    assert_equal "Absolutely!", p1["friends"][0]["isAwesome"]
+  end
   
   def test_unset
     p1 = Person.new(:name => "Jordan")

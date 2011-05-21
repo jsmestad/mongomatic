@@ -305,10 +305,11 @@ module Mongomatic
       return [parts[0], curr_hash] if parts.size == 1
       field = parts.pop # last one is the field
       parts.each_with_index do |part, i|
-        return [part, curr_hash] if break_if_dne && !curr_hash.has_key?(part)
-        curr_hash[part] ||= {}
-        return [field, curr_hash[part]] if parts.size == i+1
-        curr_hash = curr_hash[part]
+        part_accessor = curr_hash.kind_of?(Array) ? part.to_i : part
+        return [part, curr_hash] if break_if_dne && !curr_hash.has_key?(part_accessor)
+        curr_hash[part_accessor] ||= {}
+        return [field, curr_hash[part_accessor]] if parts.size == i+1
+        curr_hash = curr_hash[part_accessor]
       end
     end
     
