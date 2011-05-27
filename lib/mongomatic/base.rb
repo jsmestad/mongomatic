@@ -67,7 +67,7 @@ module Mongomatic
 
       # Return the number of documents in the collection
       def count
-        find.count
+        collection.count
       end
 
       def drop
