@@ -4,6 +4,7 @@ module Mongomatic
       klass.send(:attr_accessor, :removed, :is_new, :errors)
       klass.send(:attr_reader, :doc)
       klass.send(:include, Modifiers)
+      klass.send(:include, ActiveModelCompliancy)
     end
     
     # Public Instance Methods
