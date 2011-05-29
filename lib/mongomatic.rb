@@ -37,7 +37,6 @@ end
 require "#{File.dirname(__FILE__)}/mongomatic/observer"
 require "#{File.dirname(__FILE__)}/mongomatic/observable"
 require "#{File.dirname(__FILE__)}/mongomatic/exceptions"
-require "#{File.dirname(__FILE__)}/mongomatic/util"
 require "#{File.dirname(__FILE__)}/mongomatic/modifiers"
 require "#{File.dirname(__FILE__)}/mongomatic/expectations"
 require "#{File.dirname(__FILE__)}/mongomatic/active_model_compliancy"
