@@ -2,7 +2,6 @@ module Mongomatic
   class Base
     include Mongomatic
     include Mongomatic::Modifiers
-    include Mongomatic::Util
     include Mongomatic::ActiveModelCompliancy
     include Mongomatic::TypedFields
 

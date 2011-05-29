@@ -3,6 +3,7 @@ module Mongomatic
     def self.included(klass)
       klass.send(:attr_accessor, :removed, :is_new, :errors)
       klass.send(:attr_reader, :doc)
+      klass.send(:include, Modifiers)
     end
     
     # Public Instance Methods
@@ -233,7 +234,6 @@ module Mongomatic
       end
     end
     private :hash_for_field
-    
     
     # Override this with your own validate() method for validations.
     # Simply push your errors into the self.errors property and

@@ -121,7 +121,7 @@ module Mongomatic
     # MongoDB equivalent: { $inc : { field : value } }<br/>
     # Increments field by the number value if field is present in the object, otherwise sets field to the number value.
     #  user.inc("cents_in_wallet", 1000)
-    def inc(field, val, update_opts={}, safe=false)
+    def inc(field, val=1, update_opts={}, safe=false)
       mongo_field = field.to_s
       field, hash = hash_for_field(mongo_field)
       
@@ -141,7 +141,7 @@ module Mongomatic
       end
     end
     
-    def inc!(field, val, update_opts={})
+    def inc!(field, val=1, update_opts={})
       inc(field, val, update_opts, true)
     end
     
@@ -281,5 +281,10 @@ module Mongomatic
       pop_first(field, update_opts, true)
     end
     
+    def create_array(val)
+      val.is_a?(Array) ? val : [val]
+    end
+    private :create_array
+
   end
 end
