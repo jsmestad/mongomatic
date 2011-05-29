@@ -13,7 +13,9 @@
  * chained modifiers
 
  Refactor:
- * Mongomatic::Base should be a module instead of inheritence
+ * Mongomatic::Base should be a module instead of inheritence (completed)
+   * Still maintains backwards compat by providing Base which includes Mongomatic
+     * typed_field DSL broken, however
 
  Deprecate:
  * Validation DSL is very verbose
