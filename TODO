@@ -1,15 +1,24 @@
 = 0.9.0
 
  New Features:
- * Base#find_or_initialize method (completed)
+ * Mongomatic#find_or_initialize method (completed)
  * Add railtie for loading variables from a YAML file (see http://github.com/jrwest/mongomatic-rails3)
- * Document hash should have sub-select functionality
+ * Document hash should have sub-select functionality (completed)
  * Mongomatic#Cursor should support inject and other enumerable functions
  * Capistrano/Deployment recipe that calls create_index
  * Mongomatic::Sanitize module which will bi-directionally convert invalid MongoDB key names
+ * attribute syntax to replace typed_field and validation DSLs
+ * Mongomatic#select
+ * index definition DSL on top of Mongomatic.create_indexes
+ * chained modifiers
 
  Refactor:
  * Mongomatic::Base should be a module instead of inheritence
 
  Deprecate:
  * Validation DSL is very verbose
+ * typed_field DSL
+ 
+ Reference: 
+ * https://gist.github.com/993978
+ * https://gist.github.com/994253
