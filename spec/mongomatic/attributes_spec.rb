@@ -7,7 +7,7 @@ describe "Mongomatic Attributes" do
       Person.attributes.should == []
     end
     it "returns list of attributes as symbols when they are defined" do
-      GameObject.attributes.count.should == 5
+      GameObject.attributes.count.should == 6
       GameObject.attributes.each { |a| a.should be_kind_of Symbol }
     end
   end
@@ -53,6 +53,30 @@ describe "Mongomatic Attributes" do
       id = subject.insert!
       subject.item = id.to_s
       subject.item.should be_kind_of BSON::ObjectId
+    end
+    specify "casting true-like values to Boolean (TrueClass)" do
+      subject['alive'] = 1
+      subject.alive.class.should == TrueClass
+      subject['alive'] = "t"
+      subject['alive'].class.should == TrueClass
+      subject.alive = "true"
+      subject.alive.class.should == TrueClass
+      subject['alive'] = "y"
+      subject['alive'].class.should == TrueClass
+      subject['alive'] = "yes"
+      subject.alive.class.should == TrueClass
+    end
+    specify "casting false-like values to Boolean (FalseClass)" do
+      subject.alive = 0
+      subject.alive.class.should == FalseClass
+      subject.alive = "f"
+      subject.alive.class.should == FalseClass
+      subject.alive = "false"
+      subject.alive.class.should == FalseClass
+      subject.alive = "n"
+      subject.alive.class.should == FalseClass
+      subject.alive = "no"
+      subject.alive.class.should == FalseClass
     end
   end
 end

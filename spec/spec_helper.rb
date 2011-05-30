@@ -65,6 +65,7 @@ class GameObject
   attribute :name, :typed => String
   attribute :x_pos, :typed => Float
   attribute :item, :typed => BSON::ObjectId
+  attribute :alive, :typed => Boolean
 
 end
 

@@ -1,4 +1,7 @@
 module Mongomatic
+
+  class Boolean; end # used to allow type conversions to a "Boolean" type
+
   module TypeConverters
     class CannotCastValue < RuntimeError; end
     
@@ -42,7 +45,8 @@ module Mongomatic
         if type_match?
           @orig_val
         else
-          convert_orig_val || raise(CannotCastValue)
+          converted = convert_orig_val
+          converted.nil? ? raise(CannotCastValue) : converted
         end
       end
       
@@ -104,7 +108,7 @@ module Mongomatic
       end
     end
 
-    class Bool < Base
+    class Boolean < Base
       def type_match?
         @orig_val == true || @orig_val == false
       end
