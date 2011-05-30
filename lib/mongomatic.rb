@@ -9,6 +9,7 @@ require "#{File.dirname(__FILE__)}/mongomatic/class_methods"
 require "#{File.dirname(__FILE__)}/mongomatic/m_hash"
 require "#{File.dirname(__FILE__)}/mongomatic/errors"
 require "#{File.dirname(__FILE__)}/mongomatic/cursor"
+require "#{File.dirname(__FILE__)}/mongomatic/attributes"
 
 module Mongomatic
 
@@ -30,6 +31,7 @@ module Mongomatic
   def self.included(klass)
     klass.send(:include, InstanceMethods)
     klass.send(:extend, ClassMethods)
+    klass.send(:include, Attributes)
   end
 
 end
@@ -40,7 +42,6 @@ require "#{File.dirname(__FILE__)}/mongomatic/exceptions"
 require "#{File.dirname(__FILE__)}/mongomatic/modifiers"
 require "#{File.dirname(__FILE__)}/mongomatic/expectations"
 require "#{File.dirname(__FILE__)}/mongomatic/active_model_compliancy"
-require "#{File.dirname(__FILE__)}/mongomatic/type_converters"
 require "#{File.dirname(__FILE__)}/mongomatic/typed_fields"
 require "#{File.dirname(__FILE__)}/mongomatic/base"
 require "#{File.dirname(__FILE__)}/mongomatic/transaction_lock"

@@ -57,3 +57,14 @@ class Person
   end
 end
 
+class GameObject
+  include Mongomatic
+
+  attribute :silver_count
+  attribute :gold_count, :typed => Fixnum
+  attribute :name, :typed => String
+  attribute :x_pos, :typed => Float
+  attribute :item, :typed => BSON::ObjectId
+
+end
+

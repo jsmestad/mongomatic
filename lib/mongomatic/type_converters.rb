@@ -3,7 +3,29 @@ module Mongomatic
     class CannotCastValue < RuntimeError; end
     
     def self.for_type(type)
-      eval "Mongomatic::TypeConverters::#{type.to_s.camelize}"
+      return nil unless type
+      type_s = type.to_s
+      type_val = type_s =~ /::/ ? type_s.split(/::/).last.to_sym : type_s.to_sym
+      if check_const(type_val)
+        self.get_const(type_val)
+      end
+    end
+    
+    def self.check_const(type)
+      if RUBY_VERSION =~ /^1\.8/
+        self.const_defined?(type)
+      else
+        self.const_defined?(type, false)
+      end
+    end
+
+    def self.get_const(type)
+      if RUBY_VERSION =~ /^1\.8/
+        self.const_get(type)
+      else
+        self.const_get(type, false)
+      end
+
     end
     
     class Base
@@ -16,6 +38,7 @@ module Mongomatic
       end
       
       def cast
+        return nil unless @orig_val
         if type_match?
           @orig_val
         else

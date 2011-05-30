@@ -1,6 +1,9 @@
 module Mongomatic
   module InstanceMethods
     def self.included(klass)
+      klass.send(:public, :initialize)
+      klass.send(:public, :set_value_for_key)
+      klass.send(:public, :[]=)
       klass.send(:attr_accessor, :removed, :is_new, :errors)
       klass.send(:attr_reader, :doc)
       klass.send(:include, Modifiers)
@@ -15,6 +18,7 @@ module Mongomatic
       self.errors  = Mongomatic::Errors.new
       do_callback(:after_initialize)
     end
+    module_function :initialize
     
     # Insert the document into the database. Will return false if the document has
     # already been inserted or is invalid. Returns the generated BSON::ObjectId
@@ -160,6 +164,7 @@ module Mongomatic
       val = value.kind_of?(Hash) ? Mongomatic::MHash.new(value) : value
       res[field_accessor] = val
     end
+    module_function :set_value_for_key
     alias :[]= :set_value_for_key
     
     # Merge this document with the supplied hash. Useful for updates:
