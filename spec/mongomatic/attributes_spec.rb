@@ -7,7 +7,7 @@ describe "Mongomatic Attributes" do
       Person.attributes.should == []
     end
     it "returns list of attributes as symbols when they are defined" do
-      GameObject.attributes.count.should == 6
+      GameObject.attributes.count.should == 7
       GameObject.attributes.each { |a| a.should be_kind_of Symbol }
     end
   end
@@ -77,6 +77,25 @@ describe "Mongomatic Attributes" do
       subject.alive.class.should == FalseClass
       subject.alive = "no"
       subject.alive.class.should == FalseClass
+    end
+    describe "to hash" do
+      it "casts objects responding to #to_hash" do
+        mock = double("some_hashlike_object")
+        mock.stub(:to_hash).and_return({:some_data => 1})
+        subject['other_data'] = mock
+        subject['other_data'].should be_kind_of Mongomatic::MHash
+        subject['other_data'][:some_data].should == 1
+      end
+      it "casts objects responding to #to_h" do
+        mock = double("some_hashlike_object")
+        mock.stub(:to_h).and_return({:some_data => 2})
+        subject.other_data = mock
+        subject.other_data.should be_kind_of Mongomatic::MHash
+        subject['other_data.some_data'].should == 2
+      end
+      it "raises CannotCastValue for objets not responding to #to_hash or #to_h" do
+        expect { subject.other_data = 1}.to raise_exception(Mongomatic::TypeConverters::CannotCastValue)
+      end
     end
   end
 end
