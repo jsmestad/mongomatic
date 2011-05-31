@@ -137,7 +137,7 @@ module Mongomatic
       end
     end
     
-    class Regex < Base
+    class Regexp < Base
       def type_match?
         @orig_val.kind_of? ::Regexp
       end

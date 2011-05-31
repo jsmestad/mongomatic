@@ -67,6 +67,9 @@ class GameObject
   attribute :item, :typed => BSON::ObjectId
   attribute :alive, :typed => Boolean
   attribute :other_data, :typed => Hash
+  attribute :some_flag, :typed => Symbol
+  attribute :rx, :typed => Regexp
+  attribute :animals, :typed => Array
 
 end
 

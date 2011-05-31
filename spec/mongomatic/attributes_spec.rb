@@ -7,7 +7,7 @@ describe "Mongomatic Attributes" do
       Person.attributes.should == []
     end
     it "returns list of attributes as symbols when they are defined" do
-      GameObject.attributes.count.should == 7
+      GameObject.attributes.count.should == 10
       GameObject.attributes.each { |a| a.should be_kind_of Symbol }
     end
   end
@@ -133,6 +133,35 @@ describe "Mongomatic Attributes" do
       end
       it "raises CannotCastValue for objets not responding to #to_hash or #to_h" do
         expect { subject.other_data = 1}.to raise_exception(Mongomatic::TypeConverters::CannotCastValue)
+      end
+    end
+    describe "to symbol" do
+      it "casts objects responding to #to_sym" do
+        obj = double("symbol-like")
+        obj.stub(:to_sym).and_return(:some_symbol)
+        subject['some_flag'] = obj
+        subject.some_flag.should == :some_symbol
+      end
+      it "raises CannotCastValue for objects not responding to #to_sym" do
+        obj = double("not-symbol-like")
+        expect { subject.some_flag = obj }.to raise_exception Mongomatic::TypeConverters::CannotCastValue
+      end
+    end
+    describe "to regex" do
+      it "casts to string then regex" do
+        subject.rx = 1
+        subject.rx.should =~ "123"
+      end
+    end
+    describe "to array" do
+      # Note: in 1.8 currently, all objects respond to #to_a. 
+      # in 1.9 you may receive CannotCastValue errors on 
+      # objects not respoding to #to_a
+      it "casts objects responding to #to_a" do
+        obj = double("array-like")
+        obj.stub(:to_a).and_return([1, 2])
+        subject.animals = obj
+        subject.animals.should == [1, 2]
       end
     end
   end
