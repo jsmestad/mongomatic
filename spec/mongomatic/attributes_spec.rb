@@ -1,13 +1,13 @@
 require 'spec_helper'
 
 describe "Mongomatic Attributes" do
-  subject { GameObject.new(:silver_count => 2, :gold_count => "2", :friends => ["Tariq", "Cosmin"]) }
+  subject { GameObject.new(:silver_count => 2, :gold_count => "2", :friends => ["Tariq", "Cosmin"], :yet_another => :abc) }
   describe "fetching list of attributes" do
     it "returns empty list when no attributes are defined" do
       Person.attributes.should == []
     end
     it "returns list of attributes as symbols when they are defined" do
-      GameObject.attributes.count.should == 10
+      GameObject.attributes.count.should == 12
       GameObject.attributes.each { |a| a.should be_kind_of Symbol }
     end
   end
@@ -163,6 +163,29 @@ describe "Mongomatic Attributes" do
         subject.animals = obj
         subject.animals.should == [1, 2]
       end
+    end
+  end
+  describe "type checking" do
+    it "is silent on initialize when value has proper type" do
+      expect { GameObject.new(:another_field => "Abc") }.to_not raise_exception
+    end
+    it "raises InvalidType on initialize when value is not proper type" do
+      expect { GameObject.new(:another_field => 1) }.to raise_exception Mongomatic::InvalidType
+    end
+    it "is silent on set when value is proper type" do
+      expect { GameObject.new.another_field = "Abc" }.to_not raise_exception
+    end
+    it "raises InvalidType on set when valid is not proper type" do
+      expect { GameObject.new.another_field = 1 }.to raise_exception Mongomatic::InvalidType
+    end
+  end
+  describe "required fields" do
+    specify "document is valid if no required fields are nil" do
+      subject.should be_valid
+    end
+    specify "document is invalid if any required field is nil" do
+      subject.delete(:yet_another)
+      subject.should_not be_valid
     end
   end
 end

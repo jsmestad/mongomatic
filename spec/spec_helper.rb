@@ -70,6 +70,8 @@ class GameObject
   attribute :some_flag, :typed => Symbol
   attribute :rx, :typed => Regexp
   attribute :animals, :typed => Array
+  attribute :another_field, :typed => String, :cast => false
+  attribute :yet_another, :required => true
 
 end
 
