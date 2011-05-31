@@ -41,42 +41,80 @@ describe "Mongomatic Attributes" do
       subject.gold_count = 4.12
       subject['gold_count'].should == 4
     end
-    specify "casting to String" do
-      subject.name = 1
-      subject.name.should == "1"
+    describe "to string" do
+      it "casts any object responding to #to_s" do
+        mock = double("string-like")
+        mock.stub(:to_s).and_return("abc")
+        subject.name = mock
+        subject['name'].should == "abc"
+      end
     end
-    specify "casting to Float" do
-      subject.x_pos = "1.23"
-      subject['x_pos'].should == 1.23
+    describe "to float" do
+      it "casts any object responding to #to_f" do
+        mock = double("float-like")
+        mock.stub(:to_f).and_return(1.23)
+        subject.x_pos = mock
+        subject['x_pos'].should == 1.23
+      end
+      it "raises CannotCastValue for objects not responding to #to_f" do
+        mock = double("not-float-like")
+        expect { subject['x_pos'] = mock }.to raise_exception Mongomatic::TypeConverters::CannotCastValue
+      end
     end
-    specify "casting to ObjectId" do
-      id = subject.insert!
-      subject.item = id.to_s
-      subject.item.should be_kind_of BSON::ObjectId
+    describe "to BSON::ObjectId" do
+      it "casts valid ObjectId strings" do
+        id = subject.insert!
+        subject.item = id.to_s
+        subject.item.should be_kind_of BSON::ObjectId        
+      end
+      it "raises CannotCastValue for invalid ObjectIds" do
+        expect { subject.item = "123" }.to raise_exception Mongomatic::TypeConverters::CannotCastValue        
+      end
     end
-    specify "casting true-like values to Boolean (TrueClass)" do
-      subject['alive'] = 1
-      subject.alive.class.should == TrueClass
-      subject['alive'] = "t"
-      subject['alive'].class.should == TrueClass
-      subject.alive = "true"
-      subject.alive.class.should == TrueClass
-      subject['alive'] = "y"
-      subject['alive'].class.should == TrueClass
-      subject['alive'] = "yes"
-      subject.alive.class.should == TrueClass
-    end
-    specify "casting false-like values to Boolean (FalseClass)" do
-      subject.alive = 0
-      subject.alive.class.should == FalseClass
-      subject.alive = "f"
-      subject.alive.class.should == FalseClass
-      subject.alive = "false"
-      subject.alive.class.should == FalseClass
-      subject.alive = "n"
-      subject.alive.class.should == FalseClass
-      subject.alive = "no"
-      subject.alive.class.should == FalseClass
+    describe "to boolean" do
+      it "casts integer value 1 to TrueClass" do
+        subject['alive'] = 1
+        subject.alive.class.should == TrueClass
+      end
+      it "casts 't' to TrueClass" do
+        subject['alive'] = "t"
+        subject['alive'].class.should == TrueClass
+      end
+      it "casts 'true' to TrueClass" do
+        subject.alive = "true"
+        subject.alive.class.should == TrueClass
+      end
+      it "casts 'y' to TrueClass" do
+        subject['alive'] = "y"
+        subject['alive'].class.should == TrueClass
+      end
+      it "casts 'yes' to TrueClass" do
+        subject['alive'] = "yes"
+        subject.alive.class.should == TrueClass
+      end
+      it "casts integer value 0 to FalseClass" do
+        subject.alive = 0
+        subject.alive.class.should == FalseClass
+      end
+      it "casts 'f' to FalseClass" do
+        subject.alive = "f"
+        subject.alive.class.should == FalseClass
+      end
+      it "casts 'false' to FalseClass" do
+        subject.alive = "false"
+        subject.alive.class.should == FalseClass
+      end
+      it "casts 'n' to FalseClass" do
+        subject.alive = "n"
+        subject.alive.class.should == FalseClass
+      end
+      it "casts 'no' to FalseClass" do
+        subject.alive = "no"
+        subject.alive.class.should == FalseClass
+      end
+      it "raises CannotCastValue for any other value" do
+        expect { subject.alive = "who_cares" }.to raise_exception Mongomatic::TypeConverters::CannotCastValue
+      end
     end
     describe "to hash" do
       it "casts objects responding to #to_hash" do
